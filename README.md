@@ -32,3 +32,5 @@ empty space in front of the bead that is intended to be eliminated.
 | settings          | Displays settings                                        |
 +-------------------+----------------------------------------------------------+
 </pre>
+
+<img href="http://dragonrider2.ueuo.com/images/Chinese_Checkers.png" alt="Chinese_Checkers.png" />
