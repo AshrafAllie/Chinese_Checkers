@@ -118,7 +118,13 @@ void main(void)
 void Ncurses_Initialization(void)
 {
  initscr();
-
+ if (has_colors())
+   if (start_color() == OK)
+   {
+    init_pair(1, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(2, COLOR_YELLOW,  COLOR_BLACK);
+    init_pair(3, COLOR_CYAN,    COLOR_BLACK);
+   }
  cbreak();
  noecho();
  nonl();
@@ -130,7 +136,7 @@ void Ncurses_Initialization(void)
 //FUNCTION: Splash_Screen
 void Splash_Screen(void)
 {
- const char *version = "v1.4.19 Ncurses version";
+ const char *version = "v1.6.19 Ncurses version + mouse & colour support";
 
  printw(
  "Chinese Checkers\n"
@@ -215,6 +221,7 @@ void ScreenBorderSetup(void)
 {
  unsigned char Row, Col;
 
+ attrset(COLOR_PAIR(1));
  mvaddch(0,           0,           ACS_ULCORNER); //top left corner
  mvaddch(0,           Screen_Cols, ACS_URCORNER); //top right corner
  mvaddch(Screen_Rows, 0,           ACS_LLCORNER); //bottom left corner
@@ -247,6 +254,8 @@ void ScreenBorderSetup(void)
  mvaddch(Screen_Rows - 4, Screen_Cols - 18, ACS_LTEE);
  mvaddch(Screen_Rows - 4, Screen_Cols,      ACS_RTEE);
  mvaddch(Screen_Rows,     Screen_Cols - 18, ACS_BTEE);
+
+ attrset(COLOR_PAIR(0));
 }
 
 
@@ -390,7 +399,7 @@ void Info_Window(unsigned char Msg)
   "Stale mate no    moves possible",
   "Game saved",
   "Game loaded",
-  "Error game not   loaded"
+  "Error game not   loaded",
  };
 
  wclear(InfoSubWin);
@@ -406,6 +415,11 @@ void Info_Window(unsigned char Msg)
 //FUNCTION: ChoiceSelection
 void ChoiceSelection(void)
 {
+#ifdef NCURSES_MOUSE_VERSION
+ MEVENT Mouse_Event;
+ mousemask(ALL_MOUSE_EVENTS, NULL);
+#endif
+
  int Key, EnteredChoice;
 
  do
@@ -517,6 +531,105 @@ void ChoiceSelection(void)
         }
         break;
 
+
+#ifdef NCURSES_MOUSE_VERSION
+   case KEY_MOUSE:
+        getmouse(&Mouse_Event);
+
+        //Main Window
+        if ((Mouse_Event.y >=  3 && Mouse_Event.y <= 19 &&
+             Mouse_Event.x >= 19 && Mouse_Event.x <= 27
+            ) ||
+            (Mouse_Event.y >=  9 && Mouse_Event.y <= 13 &&
+             Mouse_Event.x >=  7 && Mouse_Event.x <= 39
+            )
+           )
+        {
+         if (CurrentSubWindow == Menu) Status_Window();
+
+         //Check for valid row and column
+         char a, //a represents the 1st value in sequence
+              d, //d represents the difference of sequence
+              total_values,
+              Row_Value,
+              Col_Value;
+
+         //Checking for valid row
+         a = 3;
+         d = 2;
+         total_values = 1;
+
+         for (Row_Value = a; total_values <= 9; Row_Value += d, total_values++)
+         {
+          if (Mouse_Event.y == Row_Value)
+            break;           //Valid row
+          else if (Row_Value > Mouse_Event.y)
+          {
+           Row_Value = 0;
+           break;
+          }
+         }
+
+
+         //Checking for valid col
+         a = 7;
+         d = 4;
+         total_values = 1;
+
+         for (Col_Value = a; total_values <= 9; Col_Value += d, total_values++)
+         {
+          if (Mouse_Event.x == Col_Value)
+            break;           //Valid col
+          else if (Col_Value > Mouse_Event.x)
+          {
+           Col_Value = 0;
+           break;
+          }
+         }
+
+         //Get Board co-ordinates
+         if ((Row_Value != 0) && (Col_Value != 0))
+         {
+          Board_Cursor_Clear();
+          Current_Board_Row = (Row_Value - 3) / 2;
+          Current_Board_Col = (Col_Value - 7) / 4;
+          Board_Cursor();
+         }
+         else
+             break;
+
+        }
+
+        //Menu Window
+        else if ((Mouse_Event.y >=  3 && Mouse_Event.y <= 8) &&
+                 (Mouse_Event.x >= 48 && Mouse_Event.x <= 62)
+                )
+        {
+         if (CurrentSubWindow == Main) Status_Window(); 
+         Key = 48 + Mouse_Event.y - 2; 
+        }
+        else if ((Mouse_Event.x >= 63) || // Area right of menu
+                 (Mouse_Event.y >= 9 && Mouse_Event.x >= 40) || // Area below menu & right of board
+                 (Mouse_Event.y >= 0 && Mouse_Event.y <=  8  &&
+                  (Mouse_Event.x >=  0 && Mouse_Event.x <= 18) ||
+                  (Mouse_Event.x >= 28 && Mouse_Event.x <= 47)
+                 ) ||                                       // Top left & top right corner of board
+                 (Mouse_Event.y >= 14 &&
+                  (Mouse_Event.x >= 0 && Mouse_Event.x <= 18) ||
+                  (Mouse_Event.x >= 28)                      // Bottom left & right corner of board
+                 ) ||
+                 (Mouse_Event.y <=  2) || // Area above board
+                 (Mouse_Event.y >= 20) || // Area below board
+                 (Mouse_Event.x <=  6) && // Area left of board
+                 CurrentSubWindow == Menu
+                )
+        {
+         MainMenu(HighlightedMenuOption);
+         wrefresh(MenuSubWin);
+         break;
+        }
+#endif
+
    case '1' ... '6':
         if (CurrentSubWindow == Menu)
         {
@@ -524,11 +637,19 @@ void ChoiceSelection(void)
          MainMenu(HighlightedMenuOption);
         }
 
+#ifdef NCURSES_MOUSE_VERSION
+        if (CurrentSubWindow == Main && Key != KEY_MOUSE)
+        {
+         Info_Window(1);
+         break;
+        }
+#else
         if (CurrentSubWindow == Main)
         {
          Info_Window(1);
          break;
         }
+#endif
 
    case ENTER_KEY:
         if (CurrentSubWindow == Menu)
@@ -647,14 +768,18 @@ void Board_Cursor_Clear(void)
 void Board_Cursor(void)
 {
  //Writes new cursor position
+ wattrset(MainSubWin, COLOR_PAIR(2) | A_BOLD);
  mvwaddch(MainSubWin, Current_Board_Row * 2 + 2, Current_Board_Col * 4 + 5, '[');
  mvwaddch(MainSubWin, Current_Board_Row * 2 + 2, Current_Board_Col * 4 + 7, ']');
+ wattrset(MainSubWin, COLOR_PAIR(0));
 
  //Writes selected bead's cursor position
  if (Selected_Bead_Row != 'N' && Selected_Bead_Col != 'N')
  {
+  wattrset(MainSubWin, COLOR_PAIR(3));
   mvwaddch(MainSubWin, Selected_Bead_Row * 2 + 2, Selected_Bead_Col * 4 + 5, '[');
   mvwaddch(MainSubWin, Selected_Bead_Row * 2 + 2, Selected_Bead_Col * 4 + 7, ']');
+  wattrset(MainSubWin, COLOR_PAIR(0));
  }
 
  if (Valid_Bead_Hop)
