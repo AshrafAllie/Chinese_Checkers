@@ -2,7 +2,7 @@
 Chinese_Checkers
 ================
 
-I created a working prototype of a variant of the Chinese Checkers board game. A
+Created a working prototype of a variant of the Chinese Checkers board game. A
 command driven program written in C that runs in the Terminal.
 
 The goal is to get 1 bead in the centre of the board. To eliminate a bead use an 
