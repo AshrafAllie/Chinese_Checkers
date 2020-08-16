@@ -1,13 +1,15 @@
-//Date:   31Mar2013Sun20:44
-//File:   Chinese_Checkers.c
-//Author: Ashraf
-//Email:  ashraf.allie01@gmail.com
-/*Desc:   A variant of the Chinese Checkers board game
-          The goal is to get 1 bead in the centre of the board. To eliminate a
-          bead use an adjacent bead to jump over the intended bead to be
-          eliminated. A bead may only jump horizontally or vertically over 1 or
-          more beads provided that there is an empty space in front of the bead
-          that is intended to be eliminated
+//Date:    31Mar2013Sun 20:44
+//Updated: 17Aug2020Mon 00:16:14
+//File:    Chinese_Checkers.c
+//Version: v1.5.14
+//Author:  Ashraf
+//Email:   ashraf.allie01@gmail.com
+/*Desc:    A variant of the Chinese Checkers board game
+           The goal is to get 1 bead in the centre of the board. To eliminate a
+           bead use an adjacent bead to jump over the intended bead to be
+           eliminated. A bead may only jump horizontally or vertically over 1 or
+           more beads provided that there is an empty space in front of the bead
+           that is intended to be eliminated
 
 
 
@@ -31,9 +33,11 @@
 //----------------
 //Macro Defintions
 //----------------
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 
 //-------------------------
@@ -54,10 +58,10 @@ unsigned char board[9][9],
               Screen_Rows,
               Screen_Cols,
               Screen[24][66],
-              Entered_Command[9],
               HighlightedMenuOption = 1,
               Valid_Bead_Hop = 0;
 
+char Entered_Command[9];
 
 enum WindowType CurrentWindow = Main;
 
@@ -77,12 +81,14 @@ void Info_Window(unsigned char Msg);
 void Command_Line(void);
 void Board_Cursor(void);
 void Bead_Manager(void);
+void Save_Game(void);
+void Load_Game(void);
 
 
 //------------
 //Main Program
 //------------
-void main(void)
+int main(void)
 {
  Splash_Screen();
  Term_Screen_Size_Detection();
@@ -101,6 +107,8 @@ void main(void)
   Display_Screen();
  }
  while (strcmp(Entered_Command, "quit"));
+
+ return 0;
 }
 
 
@@ -112,7 +120,7 @@ void main(void)
 //FUNCTION: Splash_Screen
 void Splash_Screen(void)
 {
- const char *version = "v1.4.12 standard C version";
+ const char *version = "v1.5.14 standard C version";
 
  printf(
  "Chinese Checkers\n"
@@ -125,30 +133,28 @@ void Splash_Screen(void)
  version);
 
  getchar();
- //system("reset;");
 }
 
 
 //FUNCTION: Term_Screen_Size_Detection
 void Term_Screen_Size_Detection(void)
 {
- if ((atoi(getenv("LINES")) <= 23) || (atoi(getenv("COLUMNS")) <= 65))
+ struct winsize w;
+ ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+
+ if (w.ws_row > 23) Screen_Rows = 24; else Screen_Rows = 0;
+ if (w.ws_col > 65) Screen_Cols = 66; else Screen_Cols = 0;
+
+
+ if ((Screen_Rows <= 23) || (Screen_Cols <= 65))
  {
   printf("Window size too small\nPlease resize\n"
-         "Your screen size is:\n"
-         "Screen_Rows = %d\n"
-         "Screen_Cols = %d\n\n"
          "Screen rows must be greater than 23\n"
-         "Screen columns must be greater than 65\n\n",
-         atoi(getenv("LINES")), atoi(getenv("COLUMNS")));
+         "Screen columns must be greater than 65\n\n");
 
   exit(EXIT_FAILURE);
  }
-
- //Screen_Rows = atoi(getenv("LINES"));
- //Screen_Cols = atoi(getenv("COLUMNS"));
- Screen_Rows = 24;
- Screen_Cols = 66;
 }
 
 
@@ -207,13 +213,13 @@ void ScreenBorderSetup(void)
  Screen[Screen_Rows - 2][0]= '+';                //bottom left corner
  Screen[Screen_Rows - 2][Screen_Cols - 2] = '+'; //bottom right corner
 
- for (Col = 1; Col < Screen_Cols - 2; Col++)        //top & bottom borders
+ for (Col = 1; Col < Screen_Cols - 2; Col++)     //top & bottom borders
  {
   Screen[0][Col] = '-';
   Screen[Screen_Rows - 2][Col] = '-';
  }
 
- for (Row = 1; Row < Screen_Rows - 2; Row++)        //left, right & internal borders
+ for (Row = 1; Row < Screen_Rows - 2; Row++)    //left, right & internal borders
  {
   Screen[Row][0] = '|';
   Screen[Row][Screen_Cols - 2] = '|';
@@ -222,16 +228,16 @@ void ScreenBorderSetup(void)
 
  for (Col = Screen_Cols - 19; Col < Screen_Cols - 2; Col++)
  {
-  Screen[9][Col] = '-';                             //border between Menu & Info
-  Screen[Screen_Rows - 6][Col] = '-';               //boder between Info & Status
+  Screen[9][Col] = '-';                   //border between Menu & Info
+  Screen[Screen_Rows - 6][Col] = '-';     //border between Info & Status
  }
 
-                                                    //Part of internal border conjunctions
+                                          //Part of internal border conjunctions
  Screen[0][Screen_Cols - 20] = '+';
  Screen[9][Screen_Cols - 20] = '+';
- Screen[9][Screen_Cols - 2] = '+';
+ Screen[9][Screen_Cols - 2]  = '+';
  Screen[Screen_Rows - 6][Screen_Cols - 20] = '+';
- Screen[Screen_Rows - 6][Screen_Cols - 2] = '+';
+ Screen[Screen_Rows - 6][Screen_Cols - 2]  = '+';
  Screen[Screen_Rows - 2][Screen_Cols - 20] = '+';
 }
 
@@ -240,7 +246,7 @@ void ScreenBorderSetup(void)
 void MainMenu(unsigned char HighlightedChoice)
 {
  unsigned char Menu_Row, Menu_Col, line_space_and_menu_shift_down = 0;
- unsigned char *MainMenuArray[] =
+ char *MainMenuArray[] =
  {
   "Menu:",
   "1. Intro / Help",
@@ -278,7 +284,6 @@ void Display_Screen()
 {
  unsigned char Row;
 
- //system("reset;");
  for (Row = 0; Row < Screen_Rows - 1; Row++)
     printf("%s\n", Screen[Row]);
 }
@@ -288,7 +293,7 @@ void Display_Screen()
 void Chinese_Checkers_Board()
 {
  unsigned char Game_Board_Row, Game_Board_Col;
- unsigned char *Game_Board[] =
+ char *Game_Board[] =
 {
 "    0   1   2   3   4   5   6   7   8",
 "              +---+---+---+",
@@ -322,10 +327,12 @@ for (Game_Board_Row = 0; Game_Board_Row < 21; Game_Board_Row++)
     if ((Game_Board_Row % 2) == 0 && (Game_Board_Row / 2) != 0)
       if ((Game_Board_Col % 4) == 0 && (Game_Board_Col / 4) != 0)
         if ((Game_Board_Row/2)-1 <= 8 && (Game_Board_Col/4)-1 <= 8)
+        {
           if (board[(Game_Board_Row/2)-1][(Game_Board_Col/4)-1] == 'N')
             Screen[Game_Board_Row+1][Game_Board_Col+3] = ' ';
           else
           Screen[Game_Board_Row+1][Game_Board_Col+3] = board[(Game_Board_Row/2)-1][(Game_Board_Col/4)-1];
+        }
    }
 }
 
@@ -334,7 +341,7 @@ for (Game_Board_Row = 0; Game_Board_Row < 21; Game_Board_Row++)
 void Status_Window(void)
 {
  unsigned char Col;
- unsigned char *Status[] =
+ char *Status[] =
  {
   "Window: Main",
   "Window: Menu",
@@ -356,8 +363,7 @@ void Status_Window(void)
        break;
 
   case Menu:
-       CurrentWindow = Info;
-       break;
+       CurrentWindow = Main;
 
   case Info:
        CurrentWindow = Main;
@@ -390,13 +396,13 @@ void Status_Window(void)
 void Info_Window(unsigned char Msg)
 {
  unsigned char Row = 11, Col;
- unsigned char *Info[] =
+ char *Info[] =
  {
   "Info:",
   "Error invalid  command. Type  \"help\" to list commands",
   "Options 1 to 6 only work in   the menu window",
   "Commands: up   down right leftselect tab quithelp main menu info new load  save settings",
-  "Load and Save  feature not    implemented",
+  "New Game       initialized",
   "Settings       feature not    implemented",
   "For the menu   window use     commands up    down and the   numbers 1 to 6",
   "Bead selected",
@@ -404,7 +410,10 @@ void Info_Window(unsigned char Msg)
   "Empty block",
   "Beads left:",
   "Cannot select  another bead",
-  "Congratulationsyou have solvedthe puzzle"
+  "Congratulationsyou have solvedthe puzzle",
+  "Game saved",
+  "Game loaded",
+  "Error game not loaded"
  };
 
  //Clear Info area
@@ -433,6 +442,9 @@ void Info_Window(unsigned char Msg)
   case 10:
   case 11:
   case 12:
+  case 13:
+  case 14:
+  case 15:
            for (Col = 0; Info[Msg][Col] != '\0'; Col++)
            {
             if (Col % 15 == 0)
@@ -448,7 +460,7 @@ void Info_Window(unsigned char Msg)
 //FUNCTION: Command_Line
 void Command_Line(void)
 {
- unsigned char *Command_List[] =
+ char *Command_List[] =
  {
 /* 0*/ "menu",
 /* 1*/ "1",
@@ -471,7 +483,7 @@ void Command_Line(void)
 /*18*/ "load",
 /*19*/ "save",
 /*20*/ "settings"
-};
+ };
 
  unsigned char Command_Index;
 
@@ -513,13 +525,14 @@ void Command_Line(void)
                     Chinese_Checkers_Board(); //Writes to Screen array
                     Board_Cursor();
                     CurrentWindow = Info;
+                    Info_Window(4);
                     Status_Window();
                     break;
 
-            case 3: Info_Window(4);
+            case 3: Load_Game();
                     break;
 
-            case 4: Info_Window(4);
+            case 4: Save_Game();
                     break;
 
             case 5: Info_Window(5);
@@ -564,6 +577,9 @@ void Command_Line(void)
 
                  MainMenu(--HighlightedMenuOption);
                  break;
+
+            case Info:
+                 break;
            }
 
            break;
@@ -596,6 +612,9 @@ void Command_Line(void)
                    HighlightedMenuOption = 0;
 
                  MainMenu(++HighlightedMenuOption);
+                 break;
+
+            case Info:
                  break;
            }
 
@@ -712,13 +731,14 @@ void Command_Line(void)
                           Chinese_Checkers_Board(); //Writes to Screen array
                           Board_Cursor();
                           CurrentWindow = Info;
+                          Info_Window(4);
                           Status_Window();
                           break;
 
-                  case 3: Info_Window(4);
+                  case 3: Load_Game();
                           break;
 
-                  case 4: Info_Window(4);
+                  case 4: Save_Game();
                           break;
 
                   case 5: Info_Window(5);
@@ -727,6 +747,9 @@ void Command_Line(void)
                   case 6: strcpy(Entered_Command, (char *) Command_List[14]);
                           break;
                  }
+                 break;
+
+            case Info:
                  break;
            }
            break;
@@ -762,11 +785,11 @@ void Command_Line(void)
            break;
 
   //load
-  case 18: Info_Window(4);
+  case 18: Load_Game();
            break;
 
   //save
-  case 19: Info_Window(4);
+  case 19: Save_Game();
            break;
 
   //settings
@@ -795,9 +818,10 @@ void Board_Cursor(void)
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
    Current_Board_Row = 8;
   }
-  else if ( (Current_Board_Row == 5) &&
-           ((Current_Board_Col >= 0) && (Current_Board_Col <= 2) ||
-            (Current_Board_Col >= 6) && (Current_Board_Col <= 8)
+  else if (  (Current_Board_Row == 5) &&
+           (
+            ((Current_Board_Col >= 0) && (Current_Board_Col <= 2)) ||
+            ((Current_Board_Col >= 6) && (Current_Board_Col <= 8))
            )
           )
   {
@@ -827,8 +851,9 @@ void Board_Cursor(void)
    Current_Board_Row = 0;
   }
   else if ( (Current_Board_Row == 3) &&
-           ((Current_Board_Col >= 0) && (Current_Board_Col <= 2) ||
-            (Current_Board_Col >= 6) && (Current_Board_Col <= 8)
+           (
+            ((Current_Board_Col >= 0) && (Current_Board_Col <= 2)) ||
+            ((Current_Board_Col >= 6) && (Current_Board_Col <= 8))
            )
           )
   {
@@ -857,9 +882,10 @@ void Board_Cursor(void)
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
    Current_Board_Col = 0;
   }
-  else if ( (Current_Board_Col == 3) &&
-           ((Current_Board_Row >= 0) && (Current_Board_Row <= 2) ||
-            (Current_Board_Row >= 6) && (Current_Board_Row <= 8)
+  else if (  (Current_Board_Col == 3) &&
+           (
+            ((Current_Board_Row >= 0) && (Current_Board_Row <= 2)) ||
+            ((Current_Board_Row >= 6) && (Current_Board_Row <= 8))
            )
           )
   {
@@ -888,9 +914,10 @@ void Board_Cursor(void)
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
    Current_Board_Col = 8;
   }
-  else if ( (Current_Board_Col == 5) &&
-           ((Current_Board_Row >= 0) && (Current_Board_Row <= 2) ||
-            (Current_Board_Row >= 6) && (Current_Board_Row <= 8)
+  else if (  (Current_Board_Col == 5) &&
+           (
+            ((Current_Board_Row >= 0) && (Current_Board_Row <= 2)) ||
+            ((Current_Board_Row >= 6) && (Current_Board_Row <= 8))
            )
           )
   {
@@ -988,4 +1015,82 @@ void Bead_Manager(void)
 
  if (beads == 1 && board[4][4] == 'X')
    Info_Window(12);
+}
+
+
+//FUNCTION: Save_Game
+void Save_Game(void)
+{
+ FILE *fp;
+ unsigned char i,j;
+ struct Saved_Data_Struct
+ {
+  unsigned char board[9][9],
+                beads,
+                Current_Board_Row,
+                Current_Board_Col,
+                Selected_Bead_Row,
+                Selected_Bead_Col;
+ } Saved_Data;
+
+ for (i = 0; i<=8; i++)
+    for (j = 0; j<=8; j++)
+       Saved_Data.board[i][j] = board[i][j];
+
+ Saved_Data.beads = beads;
+ Saved_Data.Current_Board_Row = Current_Board_Row;
+ Saved_Data.Current_Board_Col = Current_Board_Col;
+ Saved_Data.Selected_Bead_Row = Selected_Bead_Row;
+ Saved_Data.Selected_Bead_Col = Selected_Bead_Col;
+
+ fp = fopen("Chinese_Checkers.save", "wb");
+ if (fp)
+ {
+  fwrite(&Saved_Data, sizeof(Saved_Data), 1, fp);
+  fclose(fp);
+ }
+
+ Info_Window(13);
+}
+
+
+//FUNCTION: Load_Game
+void Load_Game(void)
+{
+ FILE *fp;
+ unsigned char i,j;
+ struct Saved_Data_Struct
+ {
+  unsigned char board[9][9],
+                beads,
+                Current_Board_Row,
+                Current_Board_Col,
+                Selected_Bead_Row,
+                Selected_Bead_Col;
+ } Saved_Data;
+
+ fp = fopen("Chinese_Checkers.save", "rb");
+ if (fp)
+ {
+  fread(&Saved_Data, sizeof(Saved_Data), 1, fp);
+  fclose(fp);
+
+
+  for (i = 0; i<=8; i++)
+     for (j = 0; j<=8; j++)
+        board[i][j] = Saved_Data.board[i][j];
+
+  beads = Saved_Data.beads;
+  Current_Board_Row = Saved_Data.Current_Board_Row;
+  Current_Board_Col = Saved_Data.Current_Board_Col;
+  Selected_Bead_Row = Saved_Data.Selected_Bead_Row;
+  Selected_Bead_Col = Saved_Data.Selected_Bead_Col;
+
+  Info_Window(14);
+  Chinese_Checkers_Board();
+  Board_Cursor();
+  CurrentWindow=Info;
+  Status_Window();
+ }
+ else Info_Window(15);
 }
