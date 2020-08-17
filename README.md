@@ -35,4 +35,4 @@ empty space in front of the bead that is intended to be eliminated.
 An image of how the game looks:
 </pre>
 
-<img src="http://dragonrider2.ueuo.com/images/Chinese_Checkers.png" />
+<img src="https://github.com/AshrafAllie/Chinese_Checkers/blob/master/Chinese_Checkers.png" />
