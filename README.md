@@ -18,7 +18,7 @@ empty space in front of the bead that is intended to be eliminated.
 | right             | Moves cursor right in the Main window only               |
 | left              | Moves cusor left in the Main window only                 |
 | select            | Selects a bead as well as deselects a bead in the Main   |
-|                   | window. Executes the current option in the Main windown  |
+|                   | window. Executes the current option in the Main window   |
 | tab               | Switches window from Main to Menu to Info & back to Main |
 | help              | Lists the commands                                       |
 | quit              | Exits the program                                        |
