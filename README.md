@@ -2,8 +2,8 @@
 Peg Solitaire <strike>Chinese_Checkers</strike>
 =============
 
-Created a working prototype of Peg Solitaire <strike>a variant of the Chinese Checkers</strike> board game. A
-command driven program written in C that runs in the Terminal.
+Created a working prototype of Peg Solitaire <strike>a variant of the Chinese Checkers</strike>
+board game. A command driven program written in C that runs in the Terminal.
 
 The goal is to get 1 bead in the centre of the board. To eliminate a bead use an 
 adjacent bead to jump over the intended bead to be eliminated. A bead may only 
