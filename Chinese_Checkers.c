@@ -39,6 +39,8 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#define BUFFER 9
+
 
 //-------------------------
 //Data Structure Defintions (struct, enum union)
@@ -61,7 +63,7 @@ unsigned char board[9][9],
               HighlightedMenuOption = 1,
               Valid_Bead_Hop = 0;
 
-char Entered_Command[9];
+char Entered_Command[BUFFER];
 
 enum WindowType CurrentWindow = Main;
 
@@ -83,6 +85,7 @@ void Board_Cursor(void);
 void Bead_Manager(void);
 void Save_Game(void);
 void Load_Game(void);
+void Input(char *string_ptr, size_t num_characters);
 
 
 //------------
@@ -489,7 +492,8 @@ void Command_Line(void)
 
  Info_Window(0);
  printf("Command: ");
- scanf("%s", Entered_Command);
+ /*scanf("%s", Entered_Command);*/
+ Input(Entered_Command, BUFFER);
  for (Command_Index = 0; Command_Index <= 20; Command_Index++)
  {
   if (strcmp(Command_List[Command_Index], Entered_Command) == 0)
@@ -1093,4 +1097,17 @@ void Load_Game(void)
   Status_Window();
  }
  else Info_Window(15);
+}
+
+
+/*FUNCTION:*/
+void Input(char *string_ptr, size_t num_characters)
+{                                                                   
+ if (fgets(string_ptr, num_characters, stdin) != NULL)              
+ {                                                                  
+  size_t last = strlen(string_ptr) - 1;                             
+                                                                    
+  if (string_ptr[last] == '\n')                                     
+    string_ptr[last] = '\0';                                        
+ }                                                                  
 }
