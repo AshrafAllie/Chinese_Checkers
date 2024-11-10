@@ -1,14 +1,13 @@
 //Date: 14Jan2013Mon
-//File: Chinese Checkers.text
-//Desc: A variant of the Chinese Checkers board game
-        The goal is to get 1 bead in the centre of the board. To eliminate a
+//File: peg_solitaire.text
+//Desc: The goal is to get 1 bead in the centre of the board. To eliminate a
         bead use an adjacent bead to jump over the intended bead to be
         eliminated. A bead may only jump horizontally or vertically over 1 or
         more beads provided that there is an empty space in front of the bead
         that is intended to be eliminated
 
 {
-//This file contains the pseudocode for Chinese Checkers game
+//This file contains the pseudocode for Peg Solitaire game
 
 Create a 2D char array 9x9 named board[9][9]
 Create and initialize variable Current_Beads = 44
@@ -43,7 +42,7 @@ Init screen cursor to associated board's cursor
 Display splash screen
 Clear screen & display borders & internal borders
 Display menu to the right
-Display Chinese checkers board with beads to the left of screen
+Display Peg Solitaire board with beads to the left of screen
 Display info window at the bottom
 Display 1 line status window at the bottom
 
