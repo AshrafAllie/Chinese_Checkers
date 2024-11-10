@@ -3,8 +3,7 @@
 //Version: v1.5.14
 //Author:  Ashraf
 //Email:   ashraf.allie01@gmail.com
-/*Desc:    A variant of the Chinese Checkers board game
-           The goal is to get 1 bead in the centre of the board. To eliminate a
+/*Desc:    The goal is to get 1 bead in the centre of the board. To eliminate a
            bead use an adjacent bead to jump over the intended bead to be
            eliminated. A bead may only jump horizontally or vertically over 1 or
            more beads provided that there is an empty space in front of the bead
@@ -65,7 +64,7 @@ void Board_Initialization(void);
 void ScreenBorderSetup(void);
 void MainMenu(unsigned char HighlightedChoice);
 void Display_Screen(void);
-void Chinese_Checkers_Board(void);
+void Peg_Solitaire_Board(void);
 void Status_Window(void);
 void Info_Window(unsigned char Msg);
 void Command_Line(void);
@@ -87,7 +86,7 @@ int main(void)
  ScreenBorderSetup();
  Status_Window();
  MainMenu(HighlightedMenuOption);
- Chinese_Checkers_Board();
+ Peg_Solitaire_Board();
  Board_Cursor();
  Info_Window(0);
  Display_Screen();
@@ -114,8 +113,7 @@ void Splash_Screen(void)
  const char *version = "v1.5.14 standard C version";
 
  printf(
- "Chinese Checkers\n"
- "A variant of the Chinese Checkers board game\n\n"
+ "Peg Solitaire\n\n"
  "Created by Ashraf\n"
  "ashraf.allie01@gmail.com\n\n"
  "%s\n"
@@ -280,8 +278,8 @@ void Display_Screen()
 }
 
 
-//FUNCTION: Chinese_Checkers_Board
-void Chinese_Checkers_Board()
+//FUNCTION: Peg_Solitaire_Board
+void Peg_Solitaire_Board()
 {
  unsigned char Game_Board_Row, Game_Board_Col;
  char *Game_Board[] =
@@ -514,7 +512,7 @@ void Command_Line(void)
                     break;
 
             case 2: Board_Initialization();   //Resets the boards beads
-                    Chinese_Checkers_Board(); //Writes to Screen array
+                    Peg_Solitaire_Board(); //Writes to Screen array
                     Board_Cursor();
                     CurrentWindow = Info;
                     Info_Window(4);
@@ -720,7 +718,7 @@ void Command_Line(void)
                           break;
 
                   case 2: Board_Initialization();   //Resets the boards beads
-                          Chinese_Checkers_Board(); //Writes to Screen array
+                          Peg_Solitaire_Board(); //Writes to Screen array
                           Board_Cursor();
                           CurrentWindow = Info;
                           Info_Window(4);
@@ -770,7 +768,7 @@ void Command_Line(void)
 
   //new
   case 17: Board_Initialization();   //Resets the boards beads
-           Chinese_Checkers_Board(); //Writes to Screen array
+           Peg_Solitaire_Board(); //Writes to Screen array
            Board_Cursor();
            CurrentWindow = Info;
            Status_Window();
@@ -968,7 +966,7 @@ void Bead_Manager(void)
       board[Selected_Bead_Row][Selected_Bead_Col] = ' ';
       board[(Current_Board_Row + Selected_Bead_Row)/2][Current_Board_Col] = ' ';
       board[Current_Board_Row][Current_Board_Col] = 'X';
-      Chinese_Checkers_Board();
+      Peg_Solitaire_Board();
       Valid_Bead_Hop = 1;
       Board_Cursor();
       Selected_Bead_Row = 'N';
@@ -991,7 +989,7 @@ void Bead_Manager(void)
       board[Selected_Bead_Row][Selected_Bead_Col] = ' ';
       board[Current_Board_Row][(Current_Board_Col + Selected_Bead_Col)/2] = ' ';
       board[Current_Board_Row][Current_Board_Col] = 'X';
-      Chinese_Checkers_Board();
+      Peg_Solitaire_Board();
       Valid_Bead_Hop = 1;
       Board_Cursor();
       Selected_Bead_Row = 'N';
@@ -1035,7 +1033,7 @@ void Save_Game(void)
  Saved_Data.Selected_Bead_Row = Selected_Bead_Row;
  Saved_Data.Selected_Bead_Col = Selected_Bead_Col;
 
- fp = fopen("Chinese_Checkers.save", "wb");
+ fp = fopen("peg_solitaire.save", "wb");
  if (fp)
  {
   fwrite(&Saved_Data, sizeof(Saved_Data), 1, fp);
@@ -1061,7 +1059,7 @@ void Load_Game(void)
                 Selected_Bead_Col;
  } Saved_Data;
 
- fp = fopen("Chinese_Checkers.save", "rb");
+ fp = fopen("peg_solitaire.save", "rb");
  if (fp)
  {
   fread(&Saved_Data, sizeof(Saved_Data), 1, fp);
@@ -1079,7 +1077,7 @@ void Load_Game(void)
   Selected_Bead_Col = Saved_Data.Selected_Bead_Col;
 
   Info_Window(14);
-  Chinese_Checkers_Board();
+  Peg_Solitaire_Board();
   Board_Cursor();
   CurrentWindow=Info;
   Status_Window();
