@@ -1,6 +1,5 @@
 //Date:    31Mar2013Sun 20:44
-//Updated: 17Aug2020Mon 00:16:14
-//File:    Chinese_Checkers.c
+//File:    peg_solitaire.c
 //Version: v1.5.14
 //Author:  Ashraf
 //Email:   ashraf.allie01@gmail.com
