@@ -1032,7 +1032,7 @@ void Save_Game(void)
  Saved_Data.Selected_Bead_Row = Selected_Bead_Row;
  Saved_Data.Selected_Bead_Col = Selected_Bead_Col;
  
- fp = fopen("Chinese_Checkers.save", "wb");
+ fp = fopen("peg_solitaire.save", "wb");
  if (fp)
  {
   fwrite(&Saved_Data, sizeof(Saved_Data), 1, fp);
@@ -1058,7 +1058,7 @@ void Load_Game(void)
                 Selected_Bead_Col;
  } Saved_Data;
 
- fp = fopen("Chinese_Checkers.save", "rb");
+ fp = fopen("peg_solitaire.save", "rb");
  if (fp)
  {
   fread(&Saved_Data, sizeof(Saved_Data), 1, fp);
