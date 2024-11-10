@@ -1,9 +1,9 @@
-//Date:    31Mar2013Sun 20:44
+/*Date:    31Mar2013Sun 20:44
+//Updated: 10Nov2024Sun 15:59:07
 //File:    peg_solitaire.c
-//Version: v1.5.14
 //Author:  Ashraf
 //Email:   ashraf.allie01@gmail.com
-/*Desc:    The goal is to get 1 bead in the centre of the board. To eliminate a
+//Desc:    The goal is to get 1 bead in the centre of the board. To eliminate a
            bead use an adjacent bead to jump over the intended bead to be
            eliminated. A bead may only jump horizontally or vertically over 1 or
            more beads provided that there is an empty space in front of the bead
@@ -14,12 +14,18 @@
            it. This program is distributed in the hope that it will be useful,
            but WITHOUT ANY WARRANTY; without even the implied warranty of
            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+           To run with tcc command: tcc -run peg_solitaire.c
+           To compile with gcc command:
+            gcc -Wall -Werror -Wextra -Wunused peg_solitaire.c -o peg_solitaire
+           To run the executable: ./peg_solitaire
 */
 
 
-//----------------
+/*----------------
 //Macro Defintions
-//----------------
+----------------*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,35 +35,35 @@
 #define BUFFER 9
 
 
-//-------------------------
+/*-------------------------
 //Data Structure Defintions (struct, enum union)
-//-------------------------
+-------------------------*/
 enum WindowType {Main, Menu, Info};
 
 
-//----------------------------
+/*----------------------------
 //Global Variable Declarations
-//----------------------------
-unsigned char board[9][9],
-              beads,
-              Current_Board_Row,
-              Current_Board_Col,
-              Selected_Bead_Row,
-              Selected_Bead_Col,
-              Screen_Rows,
-              Screen_Cols,
-              Screen[24][66],
-              HighlightedMenuOption = 1,
-              Valid_Bead_Hop = 0;
+----------------------------*/
+int board[9][9],
+    beads,
+    Current_Board_Row,
+    Current_Board_Col,
+    Selected_Bead_Row,
+    Selected_Bead_Col,
+    Screen_Rows,
+    Screen_Cols,
+    HighlightedMenuOption = 1,
+    Valid_Bead_Hop = 0;
 
 char Entered_Command[BUFFER];
+char Screen[24][66];
 
 enum WindowType CurrentWindow = Main;
 
 
-//---------------------
+/*---------------------
 //Function Declarations (prototypes)
-//---------------------
+---------------------*/
 void Splash_Screen(void);
 void Term_Screen_Size_Detection(void);
 void Board_Initialization(void);
@@ -75,9 +81,9 @@ void Load_Game(void);
 void Input(char *string_ptr, size_t num_characters);
 
 
-//------------
+/*------------
 //Main Program
-//------------
+------------*/
 int main(void)
 {
  Splash_Screen();
@@ -102,30 +108,27 @@ int main(void)
 }
 
 
-//--------------------
+/*--------------------
 //Function Definitions (Implementation)
-//--------------------
+--------------------*/
 
 
-//FUNCTION: Splash_Screen
+/*FUNCTION:*/
 void Splash_Screen(void)
 {
- const char *version = "v1.5.14 standard C version";
-
  printf(
  "Peg Solitaire\n\n"
  "Created by Ashraf\n"
  "ashraf.allie01@gmail.com\n\n"
- "%s\n"
+ "standard C version\n"
  "Copyleft 2013\n\n"
- "Press enter key to continue\n\n",
- version);
+ "Press enter key to continue\n\n");
 
  getchar();
 }
 
 
-//FUNCTION: Term_Screen_Size_Detection
+/*FUNCTION:*/
 void Term_Screen_Size_Detection(void)
 {
  struct winsize w;
@@ -147,7 +150,7 @@ void Term_Screen_Size_Detection(void)
 }
 
 
-//FUNCTION: Board_Initialization
+/*FUNCTION:*/
 void Board_Initialization(void)
 {
  unsigned char board_row, board_col;
@@ -158,7 +161,7 @@ void Board_Initialization(void)
  Selected_Bead_Row = 'N',
  Selected_Bead_Col = 'N';
 
- //Initializing the 4 non used 3x3 blocks to NULL (N)
+ /*Initializing the 4 non used 3x3 blocks to NULL (N)*/
  for (board_row = 0; board_row <= 2; board_row++)
     for (board_col = 0; board_col <= 2; board_col++)
     {
@@ -168,24 +171,24 @@ void Board_Initialization(void)
      board[8 - board_row][8 - board_col] = 'N';
     }
 
- //Initialize all remaining blocks to beads represented by (X)
+ /*Initialize all remaining blocks to beads represented by (X)*/
  for (board_row = 0; board_row <= 2; board_row++)
     for (board_col = 3; board_col <= 5; board_col++)
     {
-     board[board_row][board_col] = 'X';     //Top 3x3 block
-     board[board_col][board_row] = 'X';     //Left 3x3 block
-     board[8 - board_row][board_col] = 'X'; //Bottom 3x3 block
-     board[board_col][8 - board_row] = 'X'; //Right 3x3 block
-     board[board_row + 3][board_col] = 'X'; //Central 3x3 block
-                                            //Warning sets the central element block!
+     board[board_row][board_col] = 'X';     /*Top 3x3 block*/
+     board[board_col][board_row] = 'X';     /*Left 3x3 block*/
+     board[8 - board_row][board_col] = 'X'; /*Bottom 3x3 block*/
+     board[board_col][8 - board_row] = 'X'; /*Right 3x3 block*/
+     board[board_row + 3][board_col] = 'X'; /*Central 3x3 block*/
+                                            /*Warning sets the central element block!*/
     }
 
- //Uninitialize the central block represented by a space
+ /*Uninitialize the central block represented by a space*/
  board[Current_Board_Row][Current_Board_Col] = ' ';
 }
 
 
-//FUNCTION: ScreenBorderSetup
+/*FUNCTION:*/
 void ScreenBorderSetup(void)
 {
  unsigned char Row, Col;
@@ -197,18 +200,18 @@ void ScreenBorderSetup(void)
      Screen[Row][Screen_Cols - 1] = '\0';
     }
 
- Screen[0][0] = '+';                             //top left corner
- Screen[0][Screen_Cols - 2] = '+';               //top right corner
- Screen[Screen_Rows - 2][0]= '+';                //bottom left corner
- Screen[Screen_Rows - 2][Screen_Cols - 2] = '+'; //bottom right corner
+ Screen[0][0] = '+';                             /*top left corner*/
+ Screen[0][Screen_Cols - 2] = '+';               /*top right corner*/
+ Screen[Screen_Rows - 2][0]= '+';                /*bottom left corner*/
+ Screen[Screen_Rows - 2][Screen_Cols - 2] = '+'; /*bottom right corner*/
 
- for (Col = 1; Col < Screen_Cols - 2; Col++)     //top & bottom borders
+ for (Col = 1; Col < Screen_Cols - 2; Col++)     /*top & bottom borders*/
  {
   Screen[0][Col] = '-';
   Screen[Screen_Rows - 2][Col] = '-';
  }
 
- for (Row = 1; Row < Screen_Rows - 2; Row++)    //left, right & internal borders
+ for (Row = 1; Row < Screen_Rows - 2; Row++)  /*left, right & internal borders*/
  {
   Screen[Row][0] = '|';
   Screen[Row][Screen_Cols - 2] = '|';
@@ -217,11 +220,11 @@ void ScreenBorderSetup(void)
 
  for (Col = Screen_Cols - 19; Col < Screen_Cols - 2; Col++)
  {
-  Screen[9][Col] = '-';                   //border between Menu & Info
-  Screen[Screen_Rows - 6][Col] = '-';     //border between Info & Status
+  Screen[9][Col] = '-';                   /*border between Menu & Info*/
+  Screen[Screen_Rows - 6][Col] = '-';     /*border between Info & Status*/
  }
 
-                                          //Part of internal border conjunctions
+                                        /*Part of internal border conjunctions*/
  Screen[0][Screen_Cols - 20] = '+';
  Screen[9][Screen_Cols - 20] = '+';
  Screen[9][Screen_Cols - 2]  = '+';
@@ -231,7 +234,7 @@ void ScreenBorderSetup(void)
 }
 
 
-//FUNCTION: MainMenu
+/*FUNCTION:*/
 void MainMenu(unsigned char HighlightedChoice)
 {
  unsigned char Menu_Row, Menu_Col, line_space_and_menu_shift_down = 0;
@@ -246,7 +249,7 @@ void MainMenu(unsigned char HighlightedChoice)
   "6. Quit"
  };
 
- //Copies Main Menu into Screen Array
+ /*Copies Main Menu into Screen Array*/
  for (Menu_Row = 0; Menu_Row <= 6; Menu_Row++)
  {
   for (Menu_Col = 0; MainMenuArray[Menu_Row][Menu_Col] != '\0'; Menu_Col++)
@@ -258,7 +261,7 @@ void MainMenu(unsigned char HighlightedChoice)
      Screen[Menu_Row + 1 + line_space_and_menu_shift_down][Screen_Cols - 18 + 2] = '[';
   }
 
-  //Clears the closed square bracket
+  /*Clears the closed square bracket*/
   Screen[Menu_Row + 1 + line_space_and_menu_shift_down][Screen_Cols - 18 + Menu_Col] = ' ';
 
   if (HighlightedChoice == Menu_Row)
@@ -268,7 +271,7 @@ void MainMenu(unsigned char HighlightedChoice)
 }
 
 
-//FUNCTION: Display_Screen
+/*FUNCTION:*/
 void Display_Screen()
 {
  unsigned char Row;
@@ -278,7 +281,7 @@ void Display_Screen()
 }
 
 
-//FUNCTION: Peg_Solitaire_Board
+/*FUNCTION:*/
 void Peg_Solitaire_Board()
 {
  unsigned char Game_Board_Row, Game_Board_Col;
@@ -307,7 +310,7 @@ void Peg_Solitaire_Board()
 "    0   1   2   3   4   5   6   7   8"
 };
 
-//Writes the Game_Board & the board beads to Screen Array
+/*Writes the Game_Board & the board beads to Screen Array*/
 for (Game_Board_Row = 0; Game_Board_Row < 21; Game_Board_Row++)
    for (Game_Board_Col = 0; Game_Board[Game_Board_Row][Game_Board_Col] != '\0'; Game_Board_Col++)
    {
@@ -326,7 +329,7 @@ for (Game_Board_Row = 0; Game_Board_Row < 21; Game_Board_Row++)
 }
 
 
-//FUNCTION: Status_Window
+/*FUNCTION:*/
 void Status_Window(void)
 {
  unsigned char Col;
@@ -353,6 +356,7 @@ void Status_Window(void)
 
   case Menu:
        CurrentWindow = Main;
+       break;
 
   case Info:
        CurrentWindow = Main;
@@ -364,8 +368,8 @@ void Status_Window(void)
        }
 
        for (Col = 0; Status[3][Col] != '\0'; Col++)
-                                       //Note the condition for for loop is the
-                                       //same length for index rows 3 & 4
+                                      /*Note the condition for for loop is the*/
+                                      /*same length for index rows 3 & 4*/
        {
         Screen[Screen_Rows - 5][Screen_Cols - 18 + Col] = Status[3][Col];
         Screen[Screen_Rows - 4][Screen_Cols - 18 + Col] = Status[4][Col];
@@ -381,7 +385,7 @@ void Status_Window(void)
 }
 
 
-//FUNCTION: Info_Window
+/*FUNCTION:*/
 void Info_Window(unsigned char Msg)
 {
  unsigned char Row = 11, Col;
@@ -405,7 +409,7 @@ void Info_Window(unsigned char Msg)
   "Error game not loaded"
  };
 
- //Clear Info area
+ /*Clear Info area*/
  for (Row = 12; Row <= 17; Row++)
     for (Col = Screen_Cols - 18; Col <= Screen_Cols - 4; Col++)
        Screen[Row][Col] = ' ';
@@ -446,7 +450,7 @@ void Info_Window(unsigned char Msg)
 }
 
 
-//FUNCTION: Command_Line
+/*FUNCTION:*/
 void Command_Line(void)
 {
  char *Command_List[] =
@@ -490,12 +494,12 @@ void Command_Line(void)
 
  switch (Command_Index)
  {
-  //menu
+  /*menu*/
   case  0: CurrentWindow = Main;
            Status_Window();
            break;
 
-  //menu options 1 to 6
+  /*menu options 1 to 6*/
   case 1:
   case 2:
   case 3:
@@ -511,8 +515,8 @@ void Command_Line(void)
             case 1: Info_Window(3);
                     break;
 
-            case 2: Board_Initialization();   //Resets the boards beads
-                    Peg_Solitaire_Board(); //Writes to Screen array
+            case 2: Board_Initialization(); /*Resets the boards beads*/
+                    Peg_Solitaire_Board();  /*Writes to Screen array*/
                     Board_Cursor();
                     CurrentWindow = Info;
                     Info_Window(4);
@@ -539,7 +543,7 @@ void Command_Line(void)
           break;
 
 
-  //up
+  /*up*/
   case  7: switch (CurrentWindow)
            {
             case Main:
@@ -574,7 +578,7 @@ void Command_Line(void)
 
            break;
 
-  //down
+  /*down*/
   case  8: switch (CurrentWindow)
            {
             case Main:
@@ -610,7 +614,7 @@ void Command_Line(void)
 
            break;
 
-  //right
+  /*right*/
   case  9: if (CurrentWindow == Main)
            {
             if ( (Current_Board_Col == 8) &&
@@ -638,7 +642,7 @@ void Command_Line(void)
 
            break;
 
-  //left
+  /*left*/
   case 10: if (CurrentWindow == Main)
            {
             if ( (Current_Board_Col == 0) &&
@@ -666,25 +670,25 @@ void Command_Line(void)
 
            break;
 
-  //select
+  /*select*/
   case 11: switch (CurrentWindow)
            {
             case Main:
                  if (board[Current_Board_Row][Current_Board_Col] == ' ' &&
                      Selected_Bead_Row == 'N' && Selected_Bead_Col == 'N'
                     )
-                   //Empty block
+                   /*Empty block*/
                    Info_Window(9);
                  else if (board[Current_Board_Row][Current_Board_Col] == ' ' &&
                           Selected_Bead_Row != 'N' && Selected_Bead_Col != 'N'
                          )
-                        //Do calculations for valid hop
+                        /*Do calculations for valid hop*/
                         Bead_Manager();
                  else if (board[Current_Board_Row][Current_Board_Col] == 'X' &&
                           Selected_Bead_Row == 'N' && Selected_Bead_Col == 'N'
                          )
                  {
-                  //Selects a bead
+                  /*Selects a bead*/
                   Selected_Bead_Row = Current_Board_Row;
                   Selected_Bead_Col = Current_Board_Col;
                   Info_Window(7);
@@ -694,7 +698,7 @@ void Command_Line(void)
                           Selected_Bead_Col == Current_Board_Col
                          )
                  {
-                  //Deselects a bead & clears bead cursor
+                  /*Deselects a bead & clears bead cursor*/
                   Board_Cursor();
                   Selected_Bead_Row = 'N';
                   Selected_Bead_Col = 'N';
@@ -705,7 +709,7 @@ void Command_Line(void)
                           Selected_Bead_Row != 'N' && Selected_Bead_Col != 'N'
                          )
                  {
-                  //Cannot select another bead
+                  /*Cannot select another bead*/
                   Info_Window(11);
                  }
 
@@ -717,8 +721,8 @@ void Command_Line(void)
                   case 1: Info_Window(3);
                           break;
 
-                  case 2: Board_Initialization();   //Resets the boards beads
-                          Peg_Solitaire_Board(); //Writes to Screen array
+                  case 2: Board_Initialization(); /*Resets the boards beads*/
+                          Peg_Solitaire_Board();  /*Writes to Screen array*/
                           Board_Cursor();
                           CurrentWindow = Info;
                           Info_Window(4);
@@ -744,65 +748,65 @@ void Command_Line(void)
            }
            break;
 
-  //tab
+  /*tab*/
   case 12: Status_Window();
            break;
 
-  //help
+  /*help*/
   case 13: Info_Window(3);
            break;
 
-  //quit
+  /*quit*/
   case 14: MainMenu(6);
            break;
 
-  //main
+  /*main*/
   case 15: CurrentWindow = Info;
            Status_Window();
            break;
 
-  //info
+  /*info*/
   case 16: CurrentWindow = Menu;
            Status_Window();
            break;
 
-  //new
-  case 17: Board_Initialization();   //Resets the boards beads
-           Peg_Solitaire_Board(); //Writes to Screen array
+  /*new*/
+  case 17: Board_Initialization(); /*Resets the boards beads*/
+           Peg_Solitaire_Board();  /*Writes to Screen array*/
            Board_Cursor();
            CurrentWindow = Info;
            Status_Window();
            break;
 
-  //load
+  /*load*/
   case 18: Load_Game();
            break;
 
-  //save
+  /*save*/
   case 19: Save_Game();
            break;
 
-  //settings
+  /*settings*/
   case 20: Info_Window(5);
            break;
 
-  //Error message display
+  /*Error message display*/
   case 21: Info_Window(1);
            break;
  }
 }
 
 
-//FUNCTION: Board_Cursor
+/*FUNCTION:*/
 void Board_Cursor(void)
 {
- //Clears previous cursor position
- //up command
+ /*Clears previous cursor position*/
+ /*up command*/
  if (strcmp(Entered_Command, "up") == 0)
  {
   if (Current_Board_Row == 8)
   {
-   //Clear board row 0
+   /*Clear board row 0*/
    Current_Board_Row = 0;
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
@@ -815,7 +819,7 @@ void Board_Cursor(void)
            )
           )
   {
-   //Clear board row 3
+   /*Clear board row 3*/
    Current_Board_Row = 3;
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
@@ -823,18 +827,18 @@ void Board_Cursor(void)
   }
   else
   {
-   //Clear the previous cursor position
+   /*Clear the previous cursor position*/
    Screen[(Current_Board_Row + 1) * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[(Current_Board_Row + 1) * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
   }
  }
 
- //down command
+ /*down command*/
  else if (strcmp(Entered_Command, "down") == 0)
  {
   if (Current_Board_Row == 0)
   {
-   //Clear board row 8
+   /*Clear board row 8*/
    Current_Board_Row = 8;
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
@@ -847,7 +851,7 @@ void Board_Cursor(void)
            )
           )
   {
-   //Clear board row 5
+   /*Clear board row 5*/
    Current_Board_Row = 5;
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
@@ -855,18 +859,18 @@ void Board_Cursor(void)
   }
   else
   {
-   //Clear the previous cursor position
+   /*Clear the previous cursor position*/
    Screen[(Current_Board_Row - 1) * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[(Current_Board_Row - 1) * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
   }
  }
 
- //right command
+ /*right command*/
  else if (strcmp(Entered_Command, "right") == 0)
  {
   if (Current_Board_Col == 0)
   {
-   //Clear board column 8
+   /*Clear board column 8*/
    Current_Board_Col = 8;
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
@@ -879,7 +883,7 @@ void Board_Cursor(void)
            )
           )
   {
-   //Clear board column 5
+   /*Clear board column 5*/
    Current_Board_Col = 5;
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
@@ -887,18 +891,18 @@ void Board_Cursor(void)
   }
   else
   {
-   //Clear the previous cursor position
+   /*Clear the previous cursor position*/
    Screen[Current_Board_Row * 2 + 3][(Current_Board_Col - 1) * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][(Current_Board_Col - 1) * 4 + 8] = ' ';
   }
  }
 
- //left command
+ /*left command*/
  else if (strcmp(Entered_Command, "left") == 0)
  {
   if (Current_Board_Col == 8)
   {
-   //Clear board column 0
+   /*Clear board column 0*/
    Current_Board_Col = 0;
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
@@ -911,7 +915,7 @@ void Board_Cursor(void)
            )
           )
   {
-   //Clear board column 3
+   /*Clear board column 3*/
    Current_Board_Col = 3;
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ' ';
@@ -919,18 +923,18 @@ void Board_Cursor(void)
   }
   else
   {
-   //Clear the previous cursor position
+   /*Clear the previous cursor position*/
    Screen[Current_Board_Row * 2 + 3][(Current_Board_Col + 1) * 4 + 6] = ' ';
    Screen[Current_Board_Row * 2 + 3][(Current_Board_Col + 1) * 4 + 8] = ' ';
   }
  }
 
 
- //Writes new cursor position
+ /*Writes new cursor position*/
  Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 6] = '[';
  Screen[Current_Board_Row * 2 + 3][Current_Board_Col * 4 + 8] = ']';
 
- //Writes selected bead's cursor position
+ /*Writes selected bead's cursor position*/
  if (Selected_Bead_Row != 'N' && Selected_Bead_Col != 'N')
  {
   Screen[Selected_Bead_Row * 2 + 3][Selected_Bead_Col * 4 + 6] = '[';
@@ -939,7 +943,7 @@ void Board_Cursor(void)
 
  if (Valid_Bead_Hop)
  {
-  //Clears the selected bead cursor after a valid hop
+  /*Clears the selected bead cursor after a valid hop*/
   Screen[Selected_Bead_Row * 2 + 3][Selected_Bead_Col * 4 + 6] = ' ';
   Screen[Selected_Bead_Row * 2 + 3][Selected_Bead_Col * 4 + 8] = ' ';
   Valid_Bead_Hop = 0;
@@ -947,7 +951,7 @@ void Board_Cursor(void)
 }
 
 
-//FUNCTION: Bead_Manager
+/*FUNCTION:*/
 void Bead_Manager(void)
 {
  /* The Bead_Manager will validate correct & incorrect bead moves, keeps track
@@ -962,7 +966,7 @@ void Bead_Manager(void)
       )
      if (board[(Current_Board_Row + Selected_Bead_Row)/2][Current_Board_Col] == 'X')
      {
-      //Erase the 2 beads & write the 1 bead
+      /*Erase the 2 beads & write the 1 bead*/
       board[Selected_Bead_Row][Selected_Bead_Col] = ' ';
       board[(Current_Board_Row + Selected_Bead_Row)/2][Current_Board_Col] = ' ';
       board[Current_Board_Row][Current_Board_Col] = 'X';
@@ -1008,7 +1012,7 @@ void Bead_Manager(void)
 }
 
 
-//FUNCTION: Save_Game
+/*FUNCTION:*/
 void Save_Game(void)
 {
  FILE *fp;
@@ -1044,7 +1048,7 @@ void Save_Game(void)
 }
 
 
-//FUNCTION: Load_Game
+/*FUNCTION:*/
 void Load_Game(void)
 {
  FILE *fp;
