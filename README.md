@@ -2,6 +2,8 @@
 Peg Solitaire <strike>Chinese_Checkers</strike>
 =============
 
+<a href="https://en.m.wikipedia.org/wiki/Peg_solitaire">link to wikipedia on peg solitaire</a>
+
 Created a working prototype of Peg Solitaire <strike>a variant of the Chinese Checkers</strike>
 board game. A command driven program written in C that runs in the Terminal.
 
