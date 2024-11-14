@@ -1,5 +1,5 @@
 /*Date:    31Mar2013Sun 20:44
-//Updated: 10Nov2024Sun 15:59:07
+//Updated: 14Nov2024Thu 18:25:45
 //File:    peg_solitaire.c
 //Author:  Ashraf
 //Email:   ashraf.allie01@gmail.com
@@ -121,7 +121,7 @@ void Splash_Screen(void)
  "Created by Ashraf\n"
  "ashraf.allie01@gmail.com\n\n"
  "standard C version\n"
- "Copyleft 2013\n\n"
+ "Copyleft 2013 - 2014\n\n"
  "Press enter key to continue\n\n");
 
  getchar();
@@ -155,7 +155,8 @@ void Board_Initialization(void)
 {
  unsigned char board_row, board_col;
 
- beads = 44;
+
+ beads             = 44;
  Current_Board_Row = 4;
  Current_Board_Col = 4;
  Selected_Bead_Row = 'N',
@@ -180,7 +181,7 @@ void Board_Initialization(void)
      board[8 - board_row][board_col] = 'X'; /*Bottom 3x3 block*/
      board[board_col][8 - board_row] = 'X'; /*Right 3x3 block*/
      board[board_row + 3][board_col] = 'X'; /*Central 3x3 block*/
-                                            /*Warning sets the central element block!*/
+                                      /*Note the central element block is set!*/
     }
 
  /*Uninitialize the central block represented by a space*/
@@ -193,43 +194,44 @@ void ScreenBorderSetup(void)
 {
  unsigned char Row, Col;
 
- for (Row = 0; Row < Screen_Rows-1; Row++)
+
+ for (Row = 0; Row < Screen_Rows - 1; Row++)
     for (Col = 0; Col < Screen_Cols; Col++)
     {
-     Screen[Row][Col] = ' ';
+     Screen[Row][Col]             = ' ';
      Screen[Row][Screen_Cols - 1] = '\0';
     }
 
- Screen[0][0] = '+';                             /*top left corner*/
- Screen[0][Screen_Cols - 2] = '+';               /*top right corner*/
- Screen[Screen_Rows - 2][0]= '+';                /*bottom left corner*/
+ Screen[0][0]                             = '+'; /*top left corner*/
+ Screen[0][Screen_Cols - 2]               = '+'; /*top right corner*/
+ Screen[Screen_Rows - 2][0]               = '+'; /*bottom left corner*/
  Screen[Screen_Rows - 2][Screen_Cols - 2] = '+'; /*bottom right corner*/
 
  for (Col = 1; Col < Screen_Cols - 2; Col++)     /*top & bottom borders*/
  {
-  Screen[0][Col] = '-';
+  Screen[0][Col]               = '-';
   Screen[Screen_Rows - 2][Col] = '-';
  }
 
  for (Row = 1; Row < Screen_Rows - 2; Row++)  /*left, right & internal borders*/
  {
-  Screen[Row][0] = '|';
-  Screen[Row][Screen_Cols - 2] = '|';
+  Screen[Row][0]                = '|';
+  Screen[Row][Screen_Cols -  2] = '|';
   Screen[Row][Screen_Cols - 20] = '|';
  }
 
  for (Col = Screen_Cols - 19; Col < Screen_Cols - 2; Col++)
  {
-  Screen[9][Col] = '-';                   /*border between Menu & Info*/
+  Screen[9][Col]               = '-';     /*border between Menu & Info*/
   Screen[Screen_Rows - 6][Col] = '-';     /*border between Info & Status*/
  }
 
                                         /*Part of internal border conjunctions*/
- Screen[0][Screen_Cols - 20] = '+';
- Screen[9][Screen_Cols - 20] = '+';
- Screen[9][Screen_Cols - 2]  = '+';
+ Screen[0][Screen_Cols - 20]               = '+';
+ Screen[9][Screen_Cols - 20]               = '+';
+ Screen[9][Screen_Cols -  2]               = '+';
  Screen[Screen_Rows - 6][Screen_Cols - 20] = '+';
- Screen[Screen_Rows - 6][Screen_Cols - 2]  = '+';
+ Screen[Screen_Rows - 6][Screen_Cols -  2] = '+';
  Screen[Screen_Rows - 2][Screen_Cols - 20] = '+';
 }
 
@@ -238,7 +240,7 @@ void ScreenBorderSetup(void)
 void MainMenu(unsigned char HighlightedChoice)
 {
  unsigned char Menu_Row, Menu_Col, line_space_and_menu_shift_down = 0;
- char *MainMenuArray[] =
+ char          *MainMenuArray[] =
  {
   "Menu:",
   "1. Intro / Help",
@@ -248,6 +250,7 @@ void MainMenu(unsigned char HighlightedChoice)
   "5. Settings",
   "6. Quit"
  };
+
 
  /*Copies Main Menu into Screen Array*/
  for (Menu_Row = 0; Menu_Row <= 6; Menu_Row++)
@@ -272,9 +275,10 @@ void MainMenu(unsigned char HighlightedChoice)
 
 
 /*FUNCTION:*/
-void Display_Screen()
+void Display_Screen(void)
 {
  unsigned char Row;
+
 
  for (Row = 0; Row < Screen_Rows - 1; Row++)
     printf("%s\n", Screen[Row]);
@@ -282,48 +286,52 @@ void Display_Screen()
 
 
 /*FUNCTION:*/
-void Peg_Solitaire_Board()
+void Peg_Solitaire_Board(void)
 {
  unsigned char Game_Board_Row, Game_Board_Col;
- char *Game_Board[] =
-{
-"    0   1   2   3   4   5   6   7   8",
-"              +---+---+---+",
-"0             |   |   |   |             0",
-"              +---+---+---+",
-"1             |   |   |   |             1",
-"              +---+---+---+",
-"2             |   |   |   |             2",
-"  +---+---+---+---+---+---+---+---+---+",
-"3 |   |   |   |   |   |   |   |   |   | 3",
-"  +---+---+---+---+---+---+---+---+---+",
-"4 |   |   |   |   |   |   |   |   |   | 4",
-"  +---+---+---+---+---+---+---+---+---+",
-"5 |   |   |   |   |   |   |   |   |   | 5",
-"  +---+---+---+---+---+---+---+---+---+",
-"6             |   |   |   |             6",
-"              +---+---+---+",
-"7             |   |   |   |             7",
-"              +---+---+---+",
-"8             |   |   |   |             8",
-"              +---+---+---+",
-"    0   1   2   3   4   5   6   7   8"
-};
+ char          *Game_Board[] =
+ {
+  "    0   1   2   3   4   5   6   7   8",
+  "              +---+---+---+",
+  "0             |   |   |   |             0",
+  "              +---+---+---+",
+  "1             |   |   |   |             1",
+  "              +---+---+---+",
+  "2             |   |   |   |             2",
+  "  +---+---+---+---+---+---+---+---+---+",
+  "3 |   |   |   |   |   |   |   |   |   | 3",
+  "  +---+---+---+---+---+---+---+---+---+",
+  "4 |   |   |   |   |   |   |   |   |   | 4",
+  "  +---+---+---+---+---+---+---+---+---+",
+  "5 |   |   |   |   |   |   |   |   |   | 5",
+  "  +---+---+---+---+---+---+---+---+---+",
+  "6             |   |   |   |             6",
+  "              +---+---+---+",
+  "7             |   |   |   |             7",
+  "              +---+---+---+",
+  "8             |   |   |   |             8",
+  "              +---+---+---+",
+  "    0   1   2   3   4   5   6   7   8"
+ };
+
 
 /*Writes the Game_Board & the board beads to Screen Array*/
 for (Game_Board_Row = 0; Game_Board_Row < 21; Game_Board_Row++)
-   for (Game_Board_Col = 0; Game_Board[Game_Board_Row][Game_Board_Col] != '\0'; Game_Board_Col++)
+   for (Game_Board_Col = 0; Game_Board[Game_Board_Row][Game_Board_Col] != '\0';
+        Game_Board_Col++)
    {
-    Screen[Game_Board_Row+1][Game_Board_Col+3] = Game_Board[Game_Board_Row][Game_Board_Col];
+    Screen[Game_Board_Row + 1][Game_Board_Col + 3] =
+                                     Game_Board[Game_Board_Row][Game_Board_Col];
 
     if ((Game_Board_Row % 2) == 0 && (Game_Board_Row / 2) != 0)
       if ((Game_Board_Col % 4) == 0 && (Game_Board_Col / 4) != 0)
-        if ((Game_Board_Row/2)-1 <= 8 && (Game_Board_Col/4)-1 <= 8)
+        if ((Game_Board_Row / 2) - 1 <= 8 && (Game_Board_Col / 4) - 1 <= 8)
         {
-          if (board[(Game_Board_Row/2)-1][(Game_Board_Col/4)-1] == 'N')
-            Screen[Game_Board_Row+1][Game_Board_Col+3] = ' ';
+          if (board[(Game_Board_Row / 2) - 1][(Game_Board_Col / 4) - 1] == 'N')
+            Screen[Game_Board_Row + 1][Game_Board_Col + 3] = ' ';
           else
-          Screen[Game_Board_Row+1][Game_Board_Col+3] = board[(Game_Board_Row/2)-1][(Game_Board_Col/4)-1];
+              Screen[Game_Board_Row + 1][Game_Board_Col + 3] =
+                      board[(Game_Board_Row / 2) - 1][(Game_Board_Col / 4) - 1];
         }
    }
 }
@@ -333,7 +341,7 @@ for (Game_Board_Row = 0; Game_Board_Row < 21; Game_Board_Row++)
 void Status_Window(void)
 {
  unsigned char Col;
- char *Status[] =
+ char          *Status[] =
  {
   "Window: Main",
   "Window: Menu",
@@ -341,6 +349,7 @@ void Status_Window(void)
   "Row:",
   "Col:"
  };
+
 
  switch (CurrentWindow)
  {
@@ -352,11 +361,13 @@ void Status_Window(void)
         Screen[Screen_Rows - 5][Col] = Screen[2][Col];
         Screen[Screen_Rows - 6][Col] = Screen[2][Col];
        }
-       break;
+  break;
+
 
   case Menu:
        CurrentWindow = Main;
-       break;
+  break;
+
 
   case Info:
        CurrentWindow = Main;
@@ -377,7 +388,7 @@ void Status_Window(void)
 
        Screen[Screen_Rows - 5][Screen_Cols - 13] = Current_Board_Row + 48;
        Screen[Screen_Rows - 4][Screen_Cols - 13] = Current_Board_Col + 48;
-       break;
+  break;
  }
 
  for (Col = 0; Status[CurrentWindow][Col] != '\0' ; Col++)
@@ -389,7 +400,7 @@ void Status_Window(void)
 void Info_Window(unsigned char Msg)
 {
  unsigned char Row = 11, Col;
- char *Info[] =
+ char          *Info[] =
  {
   "Info:",
   "Error invalid  command. Type  \"help\" to list commands",
@@ -409,6 +420,7 @@ void Info_Window(unsigned char Msg)
   "Error game not loaded"
  };
 
+
  /*Clear Info area*/
  for (Row = 12; Row <= 17; Row++)
     for (Col = Screen_Cols - 18; Col <= Screen_Cols - 4; Col++)
@@ -421,7 +433,8 @@ void Info_Window(unsigned char Msg)
   case 0: for (Col = 0; Info[Msg][Col] != '\0'; Col++)
              Screen[10][Screen_Cols - 18 + Col] = Info[Msg][Col];
 
-          break;
+  break;
+
 
   case  1:
   case  2:
@@ -438,14 +451,13 @@ void Info_Window(unsigned char Msg)
   case 13:
   case 14:
   case 15:
-           for (Col = 0; Info[Msg][Col] != '\0'; Col++)
-           {
-            if (Col % 15 == 0)
-              Row++;
-            Screen[Row][Screen_Cols - 18 + (Col % 15)] = Info[Msg][Col];
-           }
+       for (Col = 0; Info[Msg][Col] != '\0'; Col++)
+       {
+        if (Col % 15 == 0) Row++;
+        Screen[Row][Screen_Cols - 18 + (Col % 15)] = Info[Msg][Col];
+       }
 
-           break;
+  break;
  }
 }
 
@@ -455,34 +467,34 @@ void Command_Line(void)
 {
  char *Command_List[] =
  {
-/* 0*/ "menu",
-/* 1*/ "1",
-/* 2*/ "2",
-/* 3*/ "3",
-/* 4*/ "4",
-/* 5*/ "5",
-/* 6*/ "6",
-/* 7*/ "up",
-/* 8*/ "down",
-/* 9*/ "right",
-/*10*/ "left",
-/*11*/ "select",
-/*12*/ "tab",
-/*13*/ "help",
-/*14*/ "quit",
-/*15*/ "main",
-/*16*/ "info",
-/*17*/ "new",
-/*18*/ "load",
-/*19*/ "save",
-/*20*/ "settings"
+  /* 0*/ "menu",
+  /* 1*/ "1",
+  /* 2*/ "2",
+  /* 3*/ "3",
+  /* 4*/ "4",
+  /* 5*/ "5",
+  /* 6*/ "6",
+  /* 7*/ "up",
+  /* 8*/ "down",
+  /* 9*/ "right",
+  /*10*/ "left",
+  /*11*/ "select",
+  /*12*/ "tab",
+  /*13*/ "help",
+  /*14*/ "quit",
+  /*15*/ "main",
+  /*16*/ "info",
+  /*17*/ "new",
+  /*18*/ "load",
+  /*19*/ "save",
+  /*20*/ "settings"
  };
 
  unsigned char Command_Index;
 
+
  Info_Window(0);
  printf("Command: ");
- /*scanf("%s", Entered_Command);*/
  Input(Entered_Command, BUFFER);
  for (Command_Index = 0; Command_Index <= 20; Command_Index++)
  {
@@ -495,9 +507,11 @@ void Command_Line(void)
  switch (Command_Index)
  {
   /*menu*/
-  case  0: CurrentWindow = Main;
-           Status_Window();
-           break;
+  case  0:
+        CurrentWindow = Main;
+        Status_Window();
+  break;
+
 
   /*menu options 1 to 6*/
   case 1:
@@ -505,270 +519,293 @@ void Command_Line(void)
   case 3:
   case 4:
   case 5:
-  case 6: if (CurrentWindow == Menu)
-          {
-           HighlightedMenuOption = Command_Index;
-           MainMenu(HighlightedMenuOption);
+  case 6:
+       if (CurrentWindow == Menu)
+       {
+        HighlightedMenuOption = Command_Index;
+        MainMenu(HighlightedMenuOption);
 
-           switch (Command_Index)
-           {
-            case 1: Info_Window(3);
-                    break;
+        switch (Command_Index)
+        {
+         case 1: Info_Window(3);
+         break;
 
-            case 2: Board_Initialization(); /*Resets the boards beads*/
-                    Peg_Solitaire_Board();  /*Writes to Screen array*/
-                    Board_Cursor();
-                    CurrentWindow = Info;
-                    Info_Window(4);
-                    Status_Window();
-                    break;
 
-            case 3: Load_Game();
-                    break;
+         case 2: Board_Initialization(); /*Resets the boards beads*/
+                 Peg_Solitaire_Board();  /*Writes to Screen array*/
+                 Board_Cursor();
+                 CurrentWindow = Info;
+                 Info_Window(4);
+                 Status_Window();
+         break;
 
-            case 4: Save_Game();
-                    break;
 
-            case 5: Info_Window(5);
-                    break;
+         case 3: Load_Game();
+         break;
 
-            case 6: strcpy(Entered_Command, (char *) Command_List[14]);
-                    break;
-           }
 
-          }
-          else
-              Info_Window(2);
+         case 4: Save_Game();
+         break;
 
-          break;
+
+         case 5: Info_Window(5);
+         break;
+
+
+         case 6: strcpy(Entered_Command, (char *) Command_List[14]);
+         break;
+        }
+       }
+       else Info_Window(2);
+
+  break;
 
 
   /*up*/
-  case  7: switch (CurrentWindow)
-           {
-            case Main:
-                 if ( (Current_Board_Row == 0) &&
-                     ((Current_Board_Col >= 3) && (Current_Board_Col <= 5))
-                    )
-                   Current_Board_Row = 8;
-                 else if (  (Current_Board_Row == 3) &&
-                          (((Current_Board_Col >= 0) && (Current_Board_Col <= 2)) ||
-                           ((Current_Board_Col >= 6) && (Current_Board_Col <= 8))
-                          )
-                         )
-                        Current_Board_Row = 5;
-                 else
-                     Current_Board_Row--;
+  case  7:
+        switch (CurrentWindow)
+        {
+         case Main:
+              if ( (Current_Board_Row == 0) &&
+                  ((Current_Board_Col >= 3) && (Current_Board_Col <= 5))
+                 )
+                Current_Board_Row = 8;
 
-                 Board_Cursor();
-                 CurrentWindow = Info;
-                 Status_Window();
-                 break;
+              else if (  (Current_Board_Row == 3) &&
+                       (((Current_Board_Col >= 0) && (Current_Board_Col <= 2)) ||
+                        ((Current_Board_Col >= 6) && (Current_Board_Col <= 8))
+                       )
+                      )
+                     Current_Board_Row = 5;
 
-            case Menu:
-                 if (HighlightedMenuOption == 1)
-                   HighlightedMenuOption = 7;
+              else Current_Board_Row--;
 
-                 MainMenu(--HighlightedMenuOption);
-                 break;
 
-            case Info:
-                 break;
-           }
+              Board_Cursor();
+              CurrentWindow = Info;
+              Status_Window();
+         break;
 
-           break;
+
+         case Menu:
+              if (HighlightedMenuOption == 1) HighlightedMenuOption = 7;
+              MainMenu(--HighlightedMenuOption);
+         break;
+
+
+         case Info:
+         break;
+        }
+
+  break;
+
 
   /*down*/
-  case  8: switch (CurrentWindow)
-           {
-            case Main:
-                 if ( (Current_Board_Row == 8) &&
-                     ((Current_Board_Col >= 3) && (Current_Board_Col <= 5))
-                    )
-                   Current_Board_Row = 0;
-                 else if (  (Current_Board_Row == 5) &&
-                          (((Current_Board_Col >= 0) && (Current_Board_Col <= 2)) ||
-                           ((Current_Board_Col >= 6) && (Current_Board_Col <= 8))
-                          )
-                         )
-                        Current_Board_Row = 3;
-                 else
-                     Current_Board_Row++;
+  case  8:
+        switch (CurrentWindow)
+        {
+         case Main:
+              if ((Current_Board_Row == 8) &&
+                  ((Current_Board_Col >= 3) && (Current_Board_Col <= 5))
+                 )
+                Current_Board_Row = 0;
 
-                 Board_Cursor();
-                 CurrentWindow = Info;
-                 Status_Window();
+              else if (  (Current_Board_Row == 5) &&
+                       (((Current_Board_Col >= 0) && (Current_Board_Col <= 2)) ||
+                        ((Current_Board_Col >= 6) && (Current_Board_Col <= 8))
+                       )
+                      )
+                     Current_Board_Row = 3;
 
-                 break;
+              else Current_Board_Row++;
 
-            case Menu:
-                 if (HighlightedMenuOption == 6)
-                   HighlightedMenuOption = 0;
+              Board_Cursor();
+              CurrentWindow = Info;
+              Status_Window();
 
-                 MainMenu(++HighlightedMenuOption);
-                 break;
+         break;
 
-            case Info:
-                 break;
-           }
 
-           break;
+         case Menu:
+              if (HighlightedMenuOption == 6) HighlightedMenuOption = 0;
+              MainMenu(++HighlightedMenuOption);
+         break;
+
+
+         case Info:
+         break;
+        }
+
+  break;
+
 
   /*right*/
-  case  9: if (CurrentWindow == Main)
-           {
-            if ( (Current_Board_Col == 8) &&
-                ((Current_Board_Row >= 3) && (Current_Board_Row <= 5)
-                )
-               )
-              Current_Board_Col = 0;
-            else if (  (Current_Board_Col == 5) &&
-                     (((Current_Board_Row >= 0) && (Current_Board_Row <= 2)) ||
-                      ((Current_Board_Row >= 6) && (Current_Board_Row <= 8))
-                     )
-                    )
-                   Current_Board_Col = 3;
+  case  9:
+        if (CurrentWindow == Main)
+        {
+         if ( (Current_Board_Col == 8) &&
+             ((Current_Board_Row >= 3) && (Current_Board_Row <= 5)
+             )
+            )
+           Current_Board_Col = 0;
+         else if (  (Current_Board_Col == 5) &&
+                  (((Current_Board_Row >= 0) && (Current_Board_Row <= 2)) ||
+                   ((Current_Board_Row >= 6) && (Current_Board_Row <= 8))
+                  )
+                 )
+                Current_Board_Col = 3;
 
-            else
-                Current_Board_Col++;
+         else Current_Board_Col++;
 
-            Board_Cursor();
-            CurrentWindow = Info;
-            Status_Window();
-           }
+         Board_Cursor();
+         CurrentWindow = Info;
+         Status_Window();
+        }
 
-           if (CurrentWindow == Menu)
-             Info_Window(6);
+        if (CurrentWindow == Menu) Info_Window(6);
+  break;
 
-           break;
 
   /*left*/
-  case 10: if (CurrentWindow == Main)
-           {
-            if ( (Current_Board_Col == 0) &&
-                ((Current_Board_Row >= 3) && (Current_Board_Row <= 5)
+  case 10:
+       if (CurrentWindow == Main)
+       {
+        if ( (Current_Board_Col == 0) &&
+            ((Current_Board_Row >= 3) && (Current_Board_Row <= 5)
+            )
+           )
+          Current_Board_Col = 8;
+
+        else if (  (Current_Board_Col == 3) &&
+                 (((Current_Board_Row >= 0) && (Current_Board_Row <= 2)) ||
+                  ((Current_Board_Row >= 6) && (Current_Board_Row <= 8))
+                 )
                 )
-               )
-              Current_Board_Col = 8;
-            else if (  (Current_Board_Col == 3) &&
-                     (((Current_Board_Row >= 0) && (Current_Board_Row <= 2)) ||
-                      ((Current_Board_Row >= 6) && (Current_Board_Row <= 8))
-                     )
-                    )
-                   Current_Board_Col = 5;
-            else
-                Current_Board_Col--;
+               Current_Board_Col = 5;
 
-            Board_Cursor();
-            CurrentWindow = Info;
-            Status_Window();
+        else Current_Board_Col--;
 
-           }
+        Board_Cursor();
+        CurrentWindow = Info;
+        Status_Window();
+       }
 
-           if (CurrentWindow == Menu)
-             Info_Window(6);
+       if (CurrentWindow == Menu) Info_Window(6);
+  break;
 
-           break;
 
   /*select*/
-  case 11: switch (CurrentWindow)
-           {
-            case Main:
-                 if (board[Current_Board_Row][Current_Board_Col] == ' ' &&
-                     Selected_Bead_Row == 'N' && Selected_Bead_Col == 'N'
-                    )
-                   /*Empty block*/
-                   Info_Window(9);
-                 else if (board[Current_Board_Row][Current_Board_Col] == ' ' &&
-                          Selected_Bead_Row != 'N' && Selected_Bead_Col != 'N'
-                         )
-                        /*Do calculations for valid hop*/
-                        Bead_Manager();
-                 else if (board[Current_Board_Row][Current_Board_Col] == 'X' &&
-                          Selected_Bead_Row == 'N' && Selected_Bead_Col == 'N'
-                         )
-                 {
-                  /*Selects a bead*/
-                  Selected_Bead_Row = Current_Board_Row;
-                  Selected_Bead_Col = Current_Board_Col;
-                  Info_Window(7);
-                 }
-                 else if (board[Current_Board_Row][Current_Board_Col] == 'X' &&
-                          Selected_Bead_Row == Current_Board_Row &&
-                          Selected_Bead_Col == Current_Board_Col
-                         )
-                 {
-                  /*Deselects a bead & clears bead cursor*/
-                  Board_Cursor();
-                  Selected_Bead_Row = 'N';
-                  Selected_Bead_Col = 'N';
-                  Board_Cursor();
-                  Info_Window(8);
-                 }
-                 else if (board[Current_Board_Row][Current_Board_Col] == 'X' &&
-                          Selected_Bead_Row != 'N' && Selected_Bead_Col != 'N'
-                         )
-                 {
-                  /*Cannot select another bead*/
-                  Info_Window(11);
-                 }
+  case 11:
+       switch (CurrentWindow)
+       {
+        case Main:
+             if (board[Current_Board_Row][Current_Board_Col] == ' ' &&
+                 Selected_Bead_Row == 'N' && Selected_Bead_Col == 'N'
+                )
+               /*Empty block*/
+               Info_Window(9);
+             else if (board[Current_Board_Row][Current_Board_Col] == ' ' &&
+                      Selected_Bead_Row != 'N' && Selected_Bead_Col != 'N'
+                     )
+                    /*Do calculations for valid hop*/
+                    Bead_Manager();
+             else if (board[Current_Board_Row][Current_Board_Col] == 'X' &&
+                      Selected_Bead_Row == 'N' && Selected_Bead_Col == 'N'
+                     )
+             {
+              /*Selects a bead*/
+              Selected_Bead_Row = Current_Board_Row;
+              Selected_Bead_Col = Current_Board_Col;
+              Info_Window(7);
+             }
+             else if (board[Current_Board_Row][Current_Board_Col] == 'X' &&
+                      Selected_Bead_Row == Current_Board_Row &&
+                      Selected_Bead_Col == Current_Board_Col
+                     )
+             {
+              /*Deselects a bead & clears bead cursor*/
+              Board_Cursor();
+              Selected_Bead_Row = 'N';
+              Selected_Bead_Col = 'N';
+              Board_Cursor();
+              Info_Window(8);
+             }
+             else if (board[Current_Board_Row][Current_Board_Col] == 'X' &&
+                      Selected_Bead_Row != 'N' && Selected_Bead_Col != 'N'
+                     )
+             {
+              /*Cannot select another bead*/
+              Info_Window(11);
+             }
+        break;
 
-                 break;
 
-            case Menu:
-                 switch (HighlightedMenuOption)
-                 {
-                  case 1: Info_Window(3);
-                          break;
+        case Menu:
+             switch (HighlightedMenuOption)
+             {
+              case 1: Info_Window(3);
+              break;
 
-                  case 2: Board_Initialization(); /*Resets the boards beads*/
-                          Peg_Solitaire_Board();  /*Writes to Screen array*/
-                          Board_Cursor();
-                          CurrentWindow = Info;
-                          Info_Window(4);
-                          Status_Window();
-                          break;
 
-                  case 3: Load_Game();
-                          break;
+              case 2: Board_Initialization(); /*Resets the boards beads*/
+                      Peg_Solitaire_Board();  /*Writes to Screen array*/
+                      Board_Cursor();
+                      CurrentWindow = Info;
+                      Info_Window(4);
+                      Status_Window();
+              break;
 
-                  case 4: Save_Game();
-                          break;
 
-                  case 5: Info_Window(5);
-                          break;
+              case 3: Load_Game();
+              break;
 
-                  case 6: strcpy(Entered_Command, (char *) Command_List[14]);
-                          break;
-                 }
-                 break;
 
-            case Info:
-                 break;
-           }
-           break;
+              case 4: Save_Game();
+              break;
+
+
+              case 5: Info_Window(5);
+              break;
+
+
+              case 6: strcpy(Entered_Command, (char *) Command_List[14]);
+              break;
+             }
+        break;
+
+
+        case Info:
+        break;
+       }
+  break;
+
 
   /*tab*/
   case 12: Status_Window();
-           break;
+  break;
+
 
   /*help*/
   case 13: Info_Window(3);
-           break;
+  break;
+
 
   /*quit*/
   case 14: MainMenu(6);
-           break;
+  break;
+
 
   /*main*/
   case 15: CurrentWindow = Info;
            Status_Window();
-           break;
+  break;
+
 
   /*info*/
   case 16: CurrentWindow = Menu;
            Status_Window();
-           break;
+  break;
+
 
   /*new*/
   case 17: Board_Initialization(); /*Resets the boards beads*/
@@ -776,23 +813,27 @@ void Command_Line(void)
            Board_Cursor();
            CurrentWindow = Info;
            Status_Window();
-           break;
+  break;
+
 
   /*load*/
   case 18: Load_Game();
-           break;
+  break;
+
 
   /*save*/
   case 19: Save_Game();
-           break;
+  break;
+
 
   /*settings*/
   case 20: Info_Window(5);
-           break;
+  break;
+
 
   /*Error message display*/
   case 21: Info_Window(1);
-           break;
+  break;
  }
 }
 
@@ -954,21 +995,26 @@ void Board_Cursor(void)
 /*FUNCTION:*/
 void Bead_Manager(void)
 {
- /* The Bead_Manager will validate correct & incorrect bead moves, keeps track
-    of total amount of beads left, writes to the board array */
+ /*The Bead_Manager will validate correct & incorrect bead moves, keeps track of
+   total amount of beads left, writes to the board array*/
 
- if (Selected_Bead_Row != 'N' && board[Current_Board_Row][Current_Board_Col] == ' ')
+ if (Selected_Bead_Row != 'N' &&
+     board[Current_Board_Row][Current_Board_Col] == ' ')
  {
   if (Current_Board_Col == Selected_Bead_Col)
   {
-   if (((Current_Board_Row > Selected_Bead_Row) && (Current_Board_Row - Selected_Bead_Row == 2)) ||
-       ((Selected_Bead_Row > Current_Board_Row) && (Selected_Bead_Row - Current_Board_Row == 2))
+   if (((Current_Board_Row > Selected_Bead_Row) &&
+        (Current_Board_Row - Selected_Bead_Row == 2)) ||
+       ((Selected_Bead_Row > Current_Board_Row) &&
+        (Selected_Bead_Row - Current_Board_Row == 2))
       )
-     if (board[(Current_Board_Row + Selected_Bead_Row)/2][Current_Board_Col] == 'X')
+     if (board[(Current_Board_Row + Selected_Bead_Row) / 2][Current_Board_Col]
+                                                                         == 'X')
      {
       /*Erase the 2 beads & write the 1 bead*/
       board[Selected_Bead_Row][Selected_Bead_Col] = ' ';
-      board[(Current_Board_Row + Selected_Bead_Row)/2][Current_Board_Col] = ' ';
+      board[(Current_Board_Row + Selected_Bead_Row) / 2][Current_Board_Col]
+                                                                          = ' ';
       board[Current_Board_Row][Current_Board_Col] = 'X';
       Peg_Solitaire_Board();
       Valid_Bead_Hop = 1;
@@ -985,13 +1031,17 @@ void Bead_Manager(void)
   }
   else if (Current_Board_Row == Selected_Bead_Row)
   {
-   if (((Current_Board_Col > Selected_Bead_Col) && (Current_Board_Col - Selected_Bead_Col == 2)) ||
-       ((Selected_Bead_Col > Current_Board_Col) && (Selected_Bead_Col - Current_Board_Col == 2))
+   if (((Current_Board_Col > Selected_Bead_Col) &&
+        (Current_Board_Col - Selected_Bead_Col == 2)) ||
+       ((Selected_Bead_Col > Current_Board_Col) &&
+        (Selected_Bead_Col - Current_Board_Col == 2))
       )
-     if (board[Current_Board_Row][(Current_Board_Col + Selected_Bead_Col)/2] == 'X')
+     if (board[Current_Board_Row][(Current_Board_Col + Selected_Bead_Col) / 2]
+                                                                         == 'X')
      {
       board[Selected_Bead_Row][Selected_Bead_Col] = ' ';
-      board[Current_Board_Row][(Current_Board_Col + Selected_Bead_Col)/2] = ' ';
+      board[Current_Board_Row][(Current_Board_Col + Selected_Bead_Col) / 2]
+                                                                          = ' ';
       board[Current_Board_Row][Current_Board_Col] = 'X';
       Peg_Solitaire_Board();
       Valid_Bead_Hop = 1;
@@ -1015,23 +1065,25 @@ void Bead_Manager(void)
 /*FUNCTION:*/
 void Save_Game(void)
 {
- FILE *fp;
+ FILE *fp = NULL;
  unsigned char i,j;
  struct Saved_Data_Struct
  {
-  unsigned char board[9][9],
-                beads,
-                Current_Board_Row,
-                Current_Board_Col,
-                Selected_Bead_Row,
-                Selected_Bead_Col;
+  int board[9][9],
+      beads,
+      Current_Board_Row,
+      Current_Board_Col,
+      Selected_Bead_Row,
+      Selected_Bead_Col;
  } Saved_Data;
 
- for (i = 0; i<=8; i++)
-    for (j = 0; j<=8; j++)
+
+ for (i = 0; i <= 8; i++)
+    for (j = 0; j <= 8; j++)
        Saved_Data.board[i][j] = board[i][j];
 
- Saved_Data.beads = beads;
+
+ Saved_Data.beads             = beads;
  Saved_Data.Current_Board_Row = Current_Board_Row;
  Saved_Data.Current_Board_Col = Current_Board_Col;
  Saved_Data.Selected_Bead_Row = Selected_Bead_Row;
@@ -1051,17 +1103,18 @@ void Save_Game(void)
 /*FUNCTION:*/
 void Load_Game(void)
 {
- FILE *fp;
+ FILE *fp = NULL;
  unsigned char i,j;
  struct Saved_Data_Struct
  {
-  unsigned char board[9][9],
-                beads,
-                Current_Board_Row,
-                Current_Board_Col,
-                Selected_Bead_Row,
-                Selected_Bead_Col;
+  int board[9][9],
+      beads,
+      Current_Board_Row,
+      Current_Board_Col,
+      Selected_Bead_Row,
+      Selected_Bead_Col;
  } Saved_Data;
+
 
  fp = fopen("peg_solitaire.save", "rb");
  if (fp)
@@ -1070,11 +1123,12 @@ void Load_Game(void)
   fclose(fp);
 
 
-  for (i = 0; i<=8; i++)
-     for (j = 0; j<=8; j++)
+  for (i = 0; i <= 8; i++)
+     for (j = 0; j <= 8; j++)
         board[i][j] = Saved_Data.board[i][j];
 
-  beads = Saved_Data.beads;
+
+  beads             = Saved_Data.beads;
   Current_Board_Row = Saved_Data.Current_Board_Row;
   Current_Board_Col = Saved_Data.Current_Board_Col;
   Selected_Bead_Row = Saved_Data.Selected_Bead_Row;
@@ -1083,7 +1137,7 @@ void Load_Game(void)
   Info_Window(14);
   Peg_Solitaire_Board();
   Board_Cursor();
-  CurrentWindow=Info;
+  CurrentWindow = Info;
   Status_Window();
  }
  else Info_Window(15);
@@ -1092,12 +1146,12 @@ void Load_Game(void)
 
 /*FUNCTION:*/
 void Input(char *string_ptr, size_t num_characters)
-{                                                                   
- if (fgets(string_ptr, num_characters, stdin) != NULL)              
- {                                                                  
-  size_t last = strlen(string_ptr) - 1;                             
-                                                                    
-  if (string_ptr[last] == '\n')                                     
-    string_ptr[last] = '\0';                                        
- }                                                                  
+{
+ if (fgets(string_ptr, num_characters, stdin) != NULL)
+ {
+  size_t last = strlen(string_ptr) - 1;
+
+  if (string_ptr[last] == '\n')
+    string_ptr[last] = '\0';
+ }
 }
